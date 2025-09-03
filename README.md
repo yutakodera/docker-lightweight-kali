@@ -25,7 +25,7 @@ Ryzen搭載ノートPC向けの軽量セキュリティツールコンテナ環�
 ## 📋 前提条件
 
 - Docker
-- Docker Compose
+- Docker Compose (v2)
 - X11環境（GUIツール使用時）
 - 2GB以上の空きメモリ
 
@@ -34,27 +34,20 @@ Ryzen搭載ノートPC向けの軽量セキュリティツールコンテナ環�
 ### 1. リポジトリのクローン
 
 ```bash
-git clone https://github.com/yourusername/security-tools-container.git
-cd security-tools-container
+git clone https://github.com/yutakodera/docker-lightweight-kali.git
+cd docker-lightweight-kali
 ```
 
-### 2. 作業ディレクトリの作成
+### 2. コンテナのビルドと起動
 
 ```bash
-mkdir workspace
+docker compose up --build -d
 ```
 
-### 3. コンテナのビルドと起動
+### 3. コンテナへの接続
 
 ```bash
-docker build -f kali-light-dockerfile -t kali-security:light .
-docker-compose -f kali-docker-compose.yml up -d
-```
-
-### 4. コンテナへの接続
-
-```bash
-docker-compose -f kali-docker-compose.yml exec kali-security-tools bash
+docker compose exec kali bash
 ```
 
 ## 🎯 使用例
@@ -108,9 +101,9 @@ wireshark &
 ## 📁 ファイル構成
 
 ```
-security-tools-container/
-├── kali-light-dockerfile     # Kali軽量版Dockerfile
-├── kali-docker-compose.yml  # Docker Compose設定
+docker-lightweight-kali/
+├── Dockerfile     # Kali軽量版Dockerfile
+├── docker-compose.yml  # Docker Compose設定
 ├── workspace/               # 作業ディレクトリ（作成要）
 └── README.md               # このファイル
 ```
@@ -118,16 +111,16 @@ security-tools-container/
 ## 🔧 カスタマイズ
 
 ### 追加ツールのインストール
-`kali-light-dockerfile`の`RUN apt-get install`セクションに追加パッケージを記述：
+`Dockerfile`の`RUN apt-get install`セクションに追加パッケージを記述：
 
-```dockerfile
+```Dockerfile
 RUN apt-get install -y --no-install-recommends \
     your-additional-tool \
     another-tool
 ```
 
 ### リソース制限の変更
-`kali-docker-compose.yml`の設定を調整：
+`docker-compose.yml`の設定を調整：
 
 ```yaml
 mem_limit: 4g      # メモリ制限
@@ -143,14 +136,14 @@ echo $DISPLAY
 xhost +local:docker
 
 # テスト用アプリで確認
-docker exec -it kali-security-container xauth
+docker exec -it kali xauth
 ```
 
 ### パッケージインストールエラー
 ```bash
 # キャッシュクリア後に再ビルド
 docker system prune -f
-docker build --no-cache -f kali-light-dockerfile -t kali-security:light .
+docker build --no-cache -t kali .
 ```
 
 ### メモリ不足エラー
