@@ -1,0 +1,43 @@
+services:
+  kali-security-tools:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kali-security:light
+    container_name: kali
+    
+    # X11フォワーディング用の設定（WiresharkのGUI用）
+    environment:
+      - DISPLAY=${DISPLAY}
+    
+    volumes:
+      # X11ソケットのマウント（Linux用）
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # 作業ディレクトリのマウント
+      - ./workspace:/workspace
+      # ホストの .Xauthority ファイル（必要に応じて）
+      - ${HOME}/.Xauthority:/root/.Xauthority:ro
+    
+    # ネットワーク設定
+    network_mode: "host"
+    
+    # 特権アクセス（ネットワーク解析用）
+    privileged: false
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    
+    # 対話的シェル
+    stdin_open: true
+    tty: true
+    
+    # セキュリティオプション
+    security_opt:
+      - seccomp:unconfined
+    
+    # リソース制限
+    mem_limit: 2g
+    cpus: '2.0'
+    
+    # 再起動ポリシー
+    restart: unless-stopped
